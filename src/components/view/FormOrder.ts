@@ -1,58 +1,40 @@
 import { IEvents } from '../base/events';
+import { Form } from '../common/Form';
+import { ensureAllElements } from '../../utils/utils';
+import { IPaymentOption } from '../../types/components/ProductAPI';
 
-export interface IOrder {
-	formOrder: HTMLFormElement;
-	buttonAll: HTMLButtonElement[];
-	paymentSelection: String;
-	formErrors: HTMLElement;
-	render(): HTMLElement;
-}
+export class Order extends Form<IPaymentOption> {
+	protected _buttonAll: HTMLButtonElement[];
 
-export class Order implements IOrder {
-	formOrder: HTMLFormElement;
-	buttonAll: HTMLButtonElement[];
-	buttonSubmit: HTMLButtonElement;
-	formErrors: HTMLElement;
+	constructor(container: HTMLFormElement, protected events: IEvents) {
+		super(container, events);
+		this._buttonAll = ensureAllElements<HTMLButtonElement>(
+			'.button_alt',
+			container
+		);
 
-	constructor(template: HTMLTemplateElement, protected events: IEvents) {
-		this.formOrder = template.content
-			.querySelector('.form')
-			.cloneNode(true) as HTMLFormElement;
-		this.buttonAll = Array.from(this.formOrder.querySelectorAll('.button_alt'));
-		this.buttonSubmit = this.formOrder.querySelector('.order__button');
-		this.formErrors = this.formOrder.querySelector('.form__errors');
-
-		this.buttonAll.forEach((item) => {
+		this._buttonAll.forEach((item) => {
 			item.addEventListener('mousedown', () => {
 				this.paymentSelection = item.name;
-				events.emit('order:paymentSelection', item);
+				events.emit('payment:change', item);
 			});
 		});
-
-		this.formOrder.addEventListener('input', (event: Event) => {
-			const target = event.target as HTMLInputElement;
-			const field = target.name;
-			const value = target.value;
-			this.events.emit(`order:changeAddress`, { field, value });
-		});
-
-		this.formOrder.addEventListener('submit', (event: Event) => {
-			event.preventDefault();
-			this.events.emit('contacts:open');
-		});
 	}
 
+	// Сеттер для выбора способа оплаты
 	set paymentSelection(paymentMethod: string) {
-		this.buttonAll.forEach((item) => {
-			item.classList.toggle('button_alt-active', item.name === paymentMethod);
+		this._buttonAll.forEach((button) => {
+			this.toggleClass(
+				button,
+				'button_alt-active',
+				button.name === paymentMethod
+			);
 		});
 	}
 
-	set valid(value: boolean) {
-		this.buttonSubmit.disabled = !value;
-	}
-
-	render() {
-		return this.formOrder;
+	// Сеттер для установки адреса
+	set address(value: string) {
+		(this.container.elements.namedItem('address') as HTMLInputElement).value =
+			value;
 	}
 }

@@ -1,33 +1,33 @@
-import { IEvents } from '../base/events';
+import { IActions } from '../../types/components/ProductAPI';
+import { ensureElement } from '../../utils/utils';
+import { Component } from '../base/Component';
 
 export interface ISuccess {
-	success: HTMLElement;
-	description: HTMLElement;
-	button: HTMLButtonElement;
-	render(total: number): HTMLElement;
+	total: number;
 }
 
-export class Success {
-	success: HTMLElement;
-	description: HTMLElement;
-	button: HTMLButtonElement;
+export class Success extends Component<ISuccess> {
+	protected _close: HTMLElement;
+	protected _total: HTMLElement;
 
-	constructor(template: HTMLTemplateElement, protected events: IEvents) {
-		this.success = template.content
-			.querySelector('.order-success')
-			.cloneNode(true) as HTMLElement;
-		this.description = this.success.querySelector(
-			'.order-success__description'
+	constructor(container: HTMLElement, actions?: IActions) {
+		super(container);
+		this._close = ensureElement<HTMLElement>(
+			'.order-success__close',
+			this.container
 		);
-		this.button = this.success.querySelector('.order-success__close');
+		this._total = ensureElement<HTMLElement>(
+			'.order-success__description',
+			this.container
+		);
 
-		this.button.addEventListener('mousedown', () => {
-			events.emit('success:close');
-		});
+		if (actions?.onClick) {
+			this._close.addEventListener('mousedown', actions.onClick);
+		}
 	}
 
-	render(total: number) {
-		this.description.textContent = String(`Списано ${total} синапсов`);
-		return this.success;
+	// Сеттер для учета суммы заказа после
+	set total(total: number) {
+		this.setText(this._total, `Списано ${total} синапсов`);
 	}
 }

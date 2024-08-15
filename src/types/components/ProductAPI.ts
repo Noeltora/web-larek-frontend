@@ -22,10 +22,19 @@ export interface IOrder extends IContacts, IPaymentOption {
 	total: number;
 }
 
-export interface IOrderResult extends IOrder {
-	id: string;
+export interface IOrderResult {
 	total: number;
 }
+
+export interface IPage {
+	counter: HTMLElement;
+	catalog: HTMLElement;
+	basket: HTMLElement;
+}
+
+export type CatalogItemStatus = {
+	category: 'софт-скил' | 'хард-скил' | 'другое' | 'кнопка' | 'дополнительное';
+};
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
 

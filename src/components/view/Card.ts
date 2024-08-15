@@ -1,67 +1,94 @@
-import { IActions, IProductItem } from '../../types/components/ProductAPI';
-import { IEvents } from '../base/events';
+import { IActions } from '../../types/components/ProductAPI';
+import { CategoryType } from '../../utils/constants';
+import { Component } from '../base/Component';
+import { ensureElement } from '../../utils/utils';
 
 export interface ICard {
-	render(data: IProductItem): HTMLElement;
+	id: string;
+	title: string;
+	category: string;
+	description: string;
+	image: string;
+	price: number | null;
+	index?: number;
 }
 
-export class Card implements ICard {
-	protected _cardElement: HTMLElement;
+export class Card extends Component<ICard> {
 	protected _category: HTMLElement;
 	protected _title: HTMLElement;
 	protected _image: HTMLImageElement;
 	protected _price: HTMLElement;
-	protected _description = <Record<string, string>>{
-		дополнительное: 'additional',
-		'софт-скил': 'soft',
-		кнопка: 'button',
-		'хард-скил': 'hard',
-		другое: 'other',
-	};
 
-	constructor(
-		template: HTMLTemplateElement,
-		protected events: IEvents,
-		actions?: IActions
-	) {
-		this._cardElement = template.content
-			.querySelector('.card')
-			.cloneNode(true) as HTMLElement;
-		this._category = this._cardElement.querySelector('.card__category');
-		this._title = this._cardElement.querySelector('.card__title');
-		this._image = this._cardElement.querySelector('.card__image');
-		this._price = this._cardElement.querySelector('.card__price');
+	constructor(container: HTMLTemplateElement, actions?: IActions) {
+		super(container);
+		this._category = container.querySelector('.card__category');
+		this._title = ensureElement<HTMLElement>(`.card__title`, container);
+		this._image = container.querySelector(`.card__image`);
+		this._price = ensureElement<HTMLImageElement>(`.card__price`, container);
 
 		if (actions?.onClick) {
-			this._cardElement.addEventListener('mousedown', actions.onClick);
+			container.addEventListener('mousedown', actions.onClick);
 		}
 	}
 
-	protected setText(element: HTMLElement, value: unknown): string {
-		if (element) {
-			return (element.textContent = String(value));
-		}
+	// Сеттер ID карточки
+	set id(value: string) {
+		this.container.dataset.id = value;
 	}
 
-	set cardCategory(value: string) {
+	// Геттер ID карточки
+	get id(): string {
+		return this.container.dataset.id || '';
+	}
+
+	// Сеттер для заголовка карточки
+	set title(value: string) {
+		this.setText(this._title, value);
+	}
+
+	// Сеттер для картинки карточки
+	set image(value: string) {
+		this.setImage(this._image, value);
+	}
+
+	// Сеттер установки цены товара
+	set price(value: number) {
+		value === null
+			? this.setText(this._price, 'Бесценно')
+			: this.setText(this._price, `${value} синапсов`);
+	}
+
+	// Сеттер установки категории товара
+	set category(value: string) {
 		this.setText(this._category, value);
-		this._category.className = `card__category card__category_${this._description[value]}`;
+		this._category.className = `card__category card__category_${CategoryType[value]}`;
 	}
+}
 
-	protected setPrice(value: number | null): string {
-		if (value === null) {
-			return 'Бесценно';
+export class CardView extends Card {
+	protected _index: HTMLElement;
+	protected _description: HTMLElement;
+	buttonElement: HTMLButtonElement;
+
+	constructor(container: HTMLTemplateElement, actions?: IActions) {
+		super(container);
+		this.buttonElement = container.querySelector('.card__button');
+		this._index = container.querySelector('.basket__item-index');
+		this._description = container.querySelector('.card__text');
+		if (actions?.onClick) {
+			if (this.buttonElement) {
+				this.buttonElement.addEventListener('mousedown', actions.onClick);
+			}
 		}
-		return String(value) + ' синапсов';
 	}
 
-	render(data: IProductItem): HTMLElement {
-		this._category.textContent = data.category;
-		this.cardCategory = data.category;
-		this._title.textContent = data.title;
-		this._image.src = data.image;
-		this._image.alt = this._title.textContent;
-		this._price.textContent = this.setPrice(data.price);
-		return this._cardElement;
+	// Сеттер индекса карточки
+	set index(value: number) {
+		this.setText(this._index, value);
+	}
+
+	// Сеттер отображения текстового содержания карточки
+	set description(value: string) {
+		this.setText(this._description, value);
 	}
 }
