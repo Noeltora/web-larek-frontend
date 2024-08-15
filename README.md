@@ -82,9 +82,6 @@ interface IOrder extends IContacts, IPaymentOption {
 }
 ```
 
-Интерфейс типов данных для модели объектов в корзине
-
-```
 Интерфейс для реализации API клиента 
  
 ``` 
