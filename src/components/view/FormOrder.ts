@@ -3,7 +3,7 @@ import { Form } from '../common/Form';
 import { ensureAllElements } from '../../utils/utils';
 import { IPaymentOption } from '../../types/components/ProductAPI';
 
-export class Order extends Form<IPaymentOption> {
+export class OrderForm extends Form<IPaymentOption> {
 	protected _buttonAll: HTMLButtonElement[];
 
 	constructor(container: HTMLFormElement, protected events: IEvents) {

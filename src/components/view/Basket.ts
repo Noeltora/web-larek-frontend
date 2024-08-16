@@ -43,12 +43,8 @@ export class Basket extends Component<IBasketView> {
 
 	// Сеттер установки выбранных элементов в корзине
 	set selected(items: string[]) {
-		if (items.length) {
-			this.setDisabled(this.button, false);
-		} else {
-			this.setDisabled(this.button, true);
-		}
-	}
+        this.setDisabled(this.button, items.length === 0);
+    }
 
 	// Сеттер установки общей суммы заказа
 	set total(sumAll: number) {

@@ -2,7 +2,7 @@ import { IEvents } from '../base/events';
 import { Form } from '../common/Form';
 import { IContacts } from '../../types/components/ProductAPI';
 
-export class Contact extends Form<IContacts> {
+export class ContactsForm extends Form<IContacts> {
 	constructor(container: HTMLFormElement, protected events: IEvents) {
 		super(container, events);
 	}

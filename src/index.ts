@@ -8,8 +8,8 @@ import { IOrder, IProductItem, IContacts } from './types/components/ProductAPI';
 import { Modal } from './components/common/Modal';
 import { ensureElement, cloneTemplate } from './utils/utils';
 import { Basket } from './components/view/Basket';
-import { Order } from './components/view/FormOrder';
-import { Contact } from './components/view/FormContacts';
+import { OrderForm } from './components/view/FormOrder';
+import { ContactsForm } from './components/view/FormContacts';
 import { Success } from './components/view/Success';
 import { AppState } from './components/model/AppState';
 import { Page } from './components/view/Page';
@@ -34,8 +34,8 @@ const basket = new Basket(
 	cloneTemplate<HTMLTemplateElement>(basketTemplate),
 	events
 );
-const order = new Order(cloneTemplate<HTMLFormElement>(orderTemplate), events);
-const contacts = new Contact(cloneTemplate(contactsTemplate), events);
+const order = new OrderForm(cloneTemplate<HTMLFormElement>(orderTemplate), events);
+const contacts = new ContactsForm(cloneTemplate(contactsTemplate), events);
 
 //Получаем данные с сервера
 apiModel
